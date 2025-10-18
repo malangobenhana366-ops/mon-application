@@ -1,0 +1,132 @@
+/* === Style général === */
+body {
+  font-family: "Poppins", sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* === En-tête === */
+header {
+  background: #2563eb;
+  color: white;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+header p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+/* === Section principale === */
+main {
+  max-width: 500px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+/* === Champs de saisie === */
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="text"]:focus {
+  border: 1px solid #2563eb;
+}
+
+/* === Boutons === */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #1e4ed8;
+}
+
+/* === Tableau de bord === */
+.dashboard {
+  text-align: center;
+}
+
+.dashboard h2 {
+  color: #2563eb;
+  font-size: 1.5rem;
+}
+
+#properties {
+  margin-top: 15px;
+  text-align: left;
+}
+
+/* === Style des propriétés === */
+.property {
+  background: #f0f4ff;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #dbeafe;
+}
+
+.property h3 {
+  margin: 0;
+  color: #1e40af;
+}
+
+.property p {
+  font-size: 0.95rem;
+  margin-top: 5px;
+  color: #555;
+}
+
+/* === Pied de page === */
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+footer p {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  main {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+}
