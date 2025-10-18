@@ -3,38 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Appwrite Housing Login</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+  <title>Connexion - Appwrite Housing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 320px;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    button {
+      background: #0070f3;
+      color: white;
+      padding: 10px;
+      width: 95%;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #005ad1;
+    }
+    #codeSection {
+      display: none;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-
   <div class="container">
-    <h1>Connexion à Housing</h1>
+    <h2>Connexion</h2>
+    <input type="text" id="phone" placeholder="Entrez votre numéro de téléphone" />
+    <button id="loginBtn">Recevoir le code</button>
 
-    <!-- SECTION 1 : Connexion -->
-    <div class="auth-section" id="authSection">
-      <h2>Connexion</h2>
-      <input type="text" id="phone" placeholder="Numéro de téléphone (ex: +243...)" />
-      <button id="loginBtn">Se connecter</button>
-    </div>
-
-    <!-- SECTION 2 : Vérification du code -->
-    <div class="verify-section" id="verifySection" style="display:none;">
-      <h2>Vérification du code</h2>
-      <input type="text" id="otp" placeholder="Entrez le code reçu par SMS" />
+    <div id="codeSection">
+      <input type="text" id="code" placeholder="Entrez le code reçu" />
       <button id="verifyBtn">Vérifier le code</button>
-    </div>
-
-    <!-- SECTION 3 : Tableau de bord -->
-    <div class="dashboard" id="dashboard" style="display:none;">
-      <h2>Bienvenue !</h2>
-      <p>Vos propriétés disponibles :</p>
-      <div id="properties"></div>
-      <button id="logoutBtn">Déconnexion</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
