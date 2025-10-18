@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appwrite Housing Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Connexion à Housing</h1>
+
+    <!-- SECTION 1 : Connexion -->
+    <div class="auth-section" id="authSection">
+      <h2>Connexion</h2>
+      <input type="text" id="phone" placeholder="Numéro de téléphone (ex: +243...)" />
+      <button id="loginBtn">Se connecter</button>
+    </div>
+
+    <!-- SECTION 2 : Vérification du code -->
+    <div class="verify-section" id="verifySection" style="display:none;">
+      <h2>Vérification du code</h2>
+      <input type="text" id="otp" placeholder="Entrez le code reçu par SMS" />
+      <button id="verifyBtn">Vérifier le code</button>
+    </div>
+
+    <!-- SECTION 3 : Tableau de bord -->
+    <div class="dashboard" id="dashboard" style="display:none;">
+      <h2>Bienvenue !</h2>
+      <p>Vos propriétés disponibles :</p>
+      <div id="properties"></div>
+      <button id="logoutBtn">Déconnexion</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
