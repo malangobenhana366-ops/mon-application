@@ -3,63 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connexion - Appwrite Housing</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f7fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      width: 320px;
-      text-align: center;
-    }
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-    }
-    button {
-      background: #0070f3;
-      color: white;
-      padding: 10px;
-      width: 95%;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background: #005ad1;
-    }
-    #codeSection {
-      display: none;
-      margin-top: 15px;
-    }
-  </style>
+  <title>Mon Application</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h2>Connexion</h2>
-    <input type="text" id="phone" placeholder="Entrez votre numéro de téléphone" />
-    <button id="loginBtn">Recevoir le code</button>
+  <header>
+    <h1>🏠 Bienvenue sur Mon Application Housing</h1>
+    <p>Recherchez facilement des maisons et parcelles autour de vous.</p>
+  </header>
 
-    <div id="codeSection">
-      <input type="text" id="code" placeholder="Entrez le code reçu" />
-      <button id="verifyBtn">Vérifier le code</button>
-    </div>
-  </div>
+  <main>
+    <section class="search-section">
+      <h2>🔍 Recherche rapide</h2>
+      <input type="text" id="searchInput" placeholder="Entrez un lieu, une ville..." />
+      <button id="searchBtn">Rechercher</button>
+    </section>
 
-  <script type="module" src="script.js"></script>
+    <section id="results" class="results-section">
+      <h2>Résultats</h2>
+      <div id="propertiesList">
+        <p>Aucun résultat pour le moment.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Mon Application Housing | Tous droits réservés</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
