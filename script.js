@@ -1,37 +1,28 @@
-import { Client, Account } from "appwrite";
+// Script principal
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const query = document.getElementById("searchInput").value.trim();
+  const results = document.getElementById("propertiesList");
 
-const client = new Client()
-    .setEndpoint("https://cloud.appwrite.io/v1")
-    .setProject("68eedca800169d5e0fa4");
+  if (query === "") {
+    results.innerHTML = "<p>Veuillez entrer un lieu avant de rechercher.</p>";
+    return;
+  }
 
-const account = new Account(client);
+  // Simulation de résultats
+  const fakeResults = [
+    { name: "Maison moderne à " + query, price: "120 000 $" },
+    { name: "Parcelle à vendre à " + query, price: "45 000 $" },
+  ];
 
-// Étape 1 : envoi du code SMS
-async function login() {
-    const phone = document.getElementById("phone").value;
-    try {
-        await account.createPhoneSession(phone);
-        alert("Code envoyé sur ton téléphone !");
-        document.getElementById("codeSection").style.display = "block";
-    } catch (error) {
-        console.error(error);
-        alert("Erreur de connexion : " + error.message);
-    }
-}
-
-// Étape 2 : vérification du code reçu
-async function verifyCode() {
-    const phone = document.getElementById("phone").value;
-    const code = document.getElementById("code").value;
-    try {
-        await account.updatePhoneSession(phone, code);
-        alert("Connexion réussie !");
-        window.location.href = "home.html"; // redirection après connexion
-    } catch (error) {
-        console.error(error);
-        alert("Code invalide : " + error.message);
-    }
-}
-
-document.getElementById("loginBtn").addEventListener("click", login);
-document.getElementById("verifyBtn").addEventListener("click", verifyCode);
+  // Affichage
+  results.innerHTML = "";
+  fakeResults.forEach((item) => {
+    const div = document.createElement("div");
+    div.classList.add("property-card");
+    div.innerHTML = `
+      <h3>${item.name}</h3>
+      <p>Prix : ${item.price}</p>
+    `;
+    results.appendChild(div);
+  });
+});
