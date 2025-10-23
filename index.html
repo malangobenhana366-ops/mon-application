@@ -1,36 +1,483 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mon Application</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Appwrite Housing — Plateforme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1720;
+    --card:#111827;
+    --muted:#9ca3af;
+    --accent:#7c3aed;
+    --accent-2:#4f46e5;
+    --success:#10b981;
+    --danger:#ef4444;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,Arial;padding:0;margin:0}
+  body{background:linear-gradient(180deg,#071019 0%, #0b1220 100%);color:#e6eef8;min-height:100vh}
+  header{padding:20px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.04)}
+  header h1{font-size:20px;letter-spacing:0.2px}
+  header p{color:var(--muted);margin-top:6px}
+  .wrap{max-width:1100px;margin:18px auto;padding:14px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); padding:16px;border-radius:12px;box-shadow: 0 10px 30px rgba(2,6,23,0.6); margin-bottom:14px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  input,textarea,select,button{font-family:inherit}
+  input,textarea,select{background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:#e6eef8;padding:10px;border-radius:8px;width:100%}
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+  .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+  .btn.danger{background:var(--danger)}
+  .small{color:var(--muted);font-size:13px}
+  .center{text-align:center}
+  .hidden{display:none}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .property-img{width:100%;height:170px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);font-weight:600}
+  footer{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .meta{color:var(--muted);font-size:13px;margin-top:6px}
+  .admin-tag{background:#111827;padding:6px 8px;border-radius:8px;color:var(--muted);font-weight:600}
+</style>
 </head>
 <body>
-  <header>
-    <h1>🏠 Bienvenue sur Mon Application Housing</h1>
-    <p>Recherchez facilement des maisons et parcelles autour de vous.</p>
-  </header>
+<header>
+  <h1>Appwrite Housing — Plateforme</h1>
+  <p class="small">Publier / Parcourir — Paiement mobile & validation admin</p>
+</header>
 
-  <main>
-    <section class="search-section">
-      <h2>🔍 Recherche rapide</h2>
-      <input type="text" id="searchInput" placeholder="Entrez un lieu, une ville..." />
-      <button id="searchBtn">Rechercher</button>
-    </section>
+<div class="wrap">
 
-    <section id="results" class="results-section">
-      <h2>Résultats</h2>
-      <div id="propertiesList">
-        <p>Aucun résultat pour le moment.</p>
+  <!-- AUTH -->
+  <div id="authSection" class="card">
+    <div class="row">
+      <div style="flex:1">
+        <h3>Connexion avec numéro</h3>
+        <p class="small">Entrez votre numéro (ex: +2438...) pour recevoir un code.</p>
+        <label>Numéro</label>
+        <input id="authPhone" placeholder="+243812345678" />
+        <div style="margin-top:8px" class="row">
+          <button id="sendCodeBtn" class="btn">Recevoir le code</button>
+          <input id="smsCode" placeholder="Code reçu" style="max-width:160px;background:transparent" />
+          <button id="verifyCodeBtn" class="btn alt">Vérifier</button>
+        </div>
+        <p id="authMsg" class="small"></p>
       </div>
-    </section>
-  </main>
 
-  <footer>
-    <p>&copy; 2025 Mon Application Housing | Tous droits réservés</p>
-  </footer>
+      <div style="width:280px" class="card" >
+        <div class="center">
+          <h4>Visiteur rapide</h4>
+          <p class="small">Parcourir sans compte (mais pour contacter, paiement requis).</p>
+          <button id="guestBtn" class="btn">Parcourir (invite)</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <script src="script.js"></script>
+  <!-- HOME -->
+  <div id="homeSection" class="card hidden center">
+    <h2 style="margin-bottom:6px">Bienvenue, <span id="userPhoneLabel"></span></h2>
+    <div class="meta">Choisis ton action</div>
+    <div style="margin-top:12px" class="row center">
+      <button id="goPublish" class="btn">Publier une maison</button>
+      <button id="goBrowse" class="btn alt">Parcourir les maisons</button>
+      <button id="goAdmin" class="btn" style="display:none">Tableau Admin</button>
+      <button id="logoutBtn" class="btn alt" style="margin-left:8px">Se déconnecter</button>
+    </div>
+  </div>
+
+  <!-- PUBLISH -->
+  <div id="publishSection" class="card hidden">
+    <div class="row">
+      <h3 style="flex:1">Publier une maison</h3>
+      <div class="meta">Remplis les champs puis suis le paiement mobile</div>
+    </div>
+
+    <form id="publishForm" class="card" style="background:transparent;border:none;padding:0">
+      <div class="grid">
+        <div>
+          <label>Titre</label>
+          <input id="titre" required />
+        </div>
+        <div>
+          <label>Prix (FC)</label>
+          <input id="prix" type="number" required />
+        </div>
+      </div>
+
+      <label>Ville</label>
+      <input id="ville" required />
+
+      <div class="grid">
+        <div>
+          <label>Commune</label>
+          <input id="commune" required />
+        </div>
+        <div>
+          <label>Quartier</label>
+          <input id="quartier" required />
+        </div>
+      </div>
+
+      <label>Description</label>
+      <textarea id="description" rows="4" required></textarea>
+
+      <label>Photo principale</label>
+      <input id="photoFile" type="file" accept="image/*" />
+
+      <div style="margin-top:12px" class="row">
+        <button id="publishBtn" class="btn">Publier (voir paiement)</button>
+        <button id="cancelPublish" type="button" class="btn alt">Annuler</button>
+      </div>
+      <p class="small" style="margin-top:8px">Le paiement de <strong>1500 FC</strong> est requis pour confirmer la publication.</p>
+    </form>
+
+    <div id="paymentBlock" class="card hidden" style="margin-top:12px">
+      <h4>Paiement mobile requis</h4>
+      <p class="small">Montant : <strong>1500 FC</strong></p>
+      <p class="small">Envoyez le montant au numéro mobile indiqué puis cliquez sur « J'ai payé ».</p>
+      <p class="pill" id="paymentNumber" style="font-weight:700;color:#fff;background:rgba(127,90,255,0.15);display:inline-block;padding:8px 12px;margin-top:8px">+243831401205</p>
+      <div style="margin-top:12px" class="row">
+        <button id="iPaidPublish" class="btn">J'ai payé (1500 FC)</button>
+        <button id="cancelPayment" class="btn alt">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BROWSE -->
+  <div id="browseSection" class="card hidden">
+    <h3>Parcourir les annonces publiées</h3>
+    <div class="row" style="margin:12px 0">
+      <input id="searchVille" placeholder="Ville" style="max-width:220px" />
+      <input id="searchCommune" placeholder="Commune" style="max-width:220px" />
+      <input id="searchQuartier" placeholder="Quartier" style="max-width:220px" />
+      <button id="searchBtn" class="btn">Chercher</button>
+    </div>
+    <div id="resultsList"></div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="adminSection" class="card hidden">
+    <h3>Tableau Admin</h3>
+    <p class="small">Valider les publications ou retirer des annonces.</p>
+    <div id="adminPending"></div>
+    <div style="margin-top:12px" class="row">
+      <button id="confirmAll" class="btn">Confirmer tout</button>
+      <button id="refreshAdmin" class="btn alt">Rafraîchir</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="small">© 2025 Appwrite Housing — Tous droits réservés</div>
+</footer>
+
+<!-- Appwrite SDK -->
+<script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+
+<script>
+/* ==============
+   CONFIG (modifie si nécessaire)
+   ============== */
+const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
+const APPWRITE_PROJECT = "68eedca800169d5e0fa4";
+const DATABASE_ID = "68eee177002ca70baccb"; // <-- ton Database ID (tu as demandé qu'on l'ajoute)
+const COLLECTION_ID = "maisons";           // <-- remplace si ton collection a un autre ID
+const BUCKET_ID = "images_maison";
+const PAYMENT_NUMBER = "+243831401205";
+const PRICE_PUBLISH = 1500;
+const PRICE_REVEAL = 2500;
+
+/* ==============
+   INIT APPWRITE
+   ============== */
+const client = new Appwrite.Client().setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
+const account = new Appwrite.Account(client);
+const databases = new Appwrite.Databases(client);
+const storage = new Appwrite.Storage(client);
+
+/* ==============
+   UTILS UI
+   ============== */
+const $ = id => document.getElementById(id);
+function show(id){ $(id).classList.remove('hidden') }
+function hide(id){ $(id).classList.add('hidden') }
+function maskPhone(phone){ if(!phone) return ""; const keep = phone.slice(0,7); return keep + "*****"; }
+
+/* ==============
+   AUTH (SMS)
+   ============== */
+$('sendCodeBtn').addEventListener('click', async ()=>{
+  const phone = $('authPhone').value.trim();
+  if(!phone){ alert("Entrez votre numéro."); return; }
+  try{
+    await account.createPhoneSession(phone);
+    $('authMsg').textContent = "Code envoyé. Vérifiez votre téléphone.";
+  }catch(e){ console.error(e); alert("Erreur en envoyant le code : " + (e.message||e)); }
+});
+
+$('verifyCodeBtn').addEventListener('click', async ()=>{
+  const phone = $('authPhone').value.trim();
+  const code = $('smsCode').value.trim();
+  if(!phone || !code){ alert("Numéro et code requis."); return; }
+  try{
+    await account.updatePhoneSession(phone, code);
+    const user = await account.get();
+    onUserLogged(user);
+  }catch(e){ console.error(e); alert("Erreur vérification : " + (e.message||e)); }
+});
+
+$('guestBtn').addEventListener('click', ()=> onGuest());
+
+/* ==============
+   SESSION / UI
+   ============== */
+async function onUserLogged(user){
+  hide('authSection');
+  show('homeSection');
+  $('userPhoneLabel').textContent = user?.phone || user?.email || "Utilisateur";
+  if(user?.phone === PAYMENT_NUMBER) $('goAdmin').style.display = 'inline-block';
+}
+function onGuest(){
+  hide('authSection'); show('homeSection');
+  $('userPhoneLabel').textContent = "Visiteur";
+}
+$('logoutBtn').addEventListener('click', async ()=>{ try{ await account.deleteSession('current'); }catch(e){} location.reload(); });
+
+/* ==============
+   NAVIGATION
+   ============== */
+$('goPublish').addEventListener('click', ()=>{ hide('homeSection'); hide('browseSection'); hide('adminSection'); show('publishSection'); hide('paymentBlock'); });
+$('goBrowse').addEventListener('click', ()=>{ hide('homeSection'); hide('publishSection'); hide('adminSection'); show('browseSection'); loadPublished(); });
+$('goAdmin').addEventListener('click', ()=>{ hide('homeSection'); hide('publishSection'); hide('browseSection'); show('adminSection'); loadPending(); });
+
+/* ==============
+   PUBLISH FLOW
+   ============== */
+$('cancelPublish').addEventListener('click', ()=>{ hide('publishSection'); show('homeSection'); });
+
+$('publishForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const titre = $('titre').value.trim();
+  const prix = parseInt($('prix').value);
+  const ville = $('ville').value.trim();
+  const commune = $('commune').value.trim();
+  const quartier = $('quartier').value.trim();
+  const description = $('description').value.trim();
+  const fileInput = $('photoFile');
+  const file = fileInput.files && fileInput.files[0];
+  if(!titre || !prix || !ville){ alert("Remplis au moins titre, prix et ville"); return; }
+
+  // montrer bloc paiement
+  show('paymentBlock');
+  $('paymentNumber').textContent = PAYMENT_NUMBER;
+});
+
+$('cancelPayment').addEventListener('click', ()=>{ hide('paymentBlock'); });
+
+// utilisateur clique "J'ai payé" — nous enregistrons en 'en_attente'
+$('iPaidPublish').addEventListener('click', async ()=>{
+  try{
+    const titre = $('titre').value.trim();
+    const prix = parseInt($('prix').value);
+    const ville = $('ville').value.trim();
+    const commune = $('commune').value.trim();
+    const quartier = $('quartier').value.trim();
+    const description = $('description').value.trim();
+    const fileInput = $('photoFile');
+    const file = fileInput.files && fileInput.files[0];
+
+    // upload image
+    let imageId = "";
+    if(file){
+      try{
+        const r = await storage.createFile(BUCKET_ID, Appwrite.ID.unique(), file);
+        imageId = r.$id;
+      }catch(e){ console.warn("Upload image failed:", e); }
+    }
+
+    // get current user if logged
+    let proprietorId = "", proprietorPhone = "";
+    try{ const u = await account.get(); proprietorId = u.$id; proprietorPhone = u?.phone || ""; }catch(e){}
+
+    // create document en attente
+    const doc = await databases.createDocument(
+      DATABASE_ID,
+      COLLECTION_ID,
+      Appwrite.ID.unique(),
+      {
+        titre,
+        description,
+        prix,
+        ville,
+        commune,
+        quartier,
+        imageId,
+        telephone_proprietaire: proprietorPhone,
+        proprietaire_id: proprietorId,
+        statut_maison: "en_attente",
+        paiement_confirme: false,
+        lien_paiement: PAYMENT_NUMBER,
+        prix_publication: PRICE_PUBLISH,
+        prix_deblocage: PRICE_REVEAL,
+        est_retiree: false,
+        createdAt: new Date().toISOString()
+      }
+    );
+
+    alert("Demande enregistrée. L'administrateur confirmera la publication après vérification.");
+    $('publishForm').reset();
+    hide('paymentBlock'); hide('publishSection'); show('homeSection');
+  }catch(err){ console.error(err); alert("Erreur enregistrement : " + (err.message||err)); }
+});
+
+/* ==============
+   BROWSE / SEARCH
+   ============== */
+$('searchBtn').addEventListener('click', loadPublished);
+
+async function loadPublished(){
+  const ville = $('searchVille').value.trim();
+  const commune = $('searchCommune').value.trim();
+  const quartier = $('searchQuartier').value.trim();
+  try{
+    const list = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [ Appwrite.Query.equal("statut_maison","publiee") ]);
+    const items = list.documents || [];
+    const results = $('resultsList'); results.innerHTML = "";
+    const filtered = items.filter(it=>{
+      if(ville && (!it.ville || it.ville.toLowerCase()!=ville.toLowerCase())) return false;
+      if(commune && (!it.commune || it.commune.toLowerCase()!=commune.toLowerCase())) return false;
+      if(quartier && (!it.quartier || it.quartier.toLowerCase()!=quartier.toLowerCase())) return false;
+      return true;
+    });
+    if(filtered.length===0){ results.innerHTML = "<p class='small'>Aucune annonce trouvée.</p>"; return; }
+    filtered.forEach(it=>{
+      const div = document.createElement('div'); div.className="card";
+      const imageUrl = it.imageId ? `${APPWRITE_ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${it.imageId}/view?project=${APPWRITE_PROJECT}` : "";
+      div.innerHTML = `
+        <div class="grid">
+          <div>${imageUrl?`<img class="property-img" src="${imageUrl}" alt="photo">`:"<div style='height:160px;background:rgba(255,255,255,0.02);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)'>Aucune image</div>"}</div>
+          <div>
+            <h3 style="margin:0">${it.titre}</h3>
+            <div class="meta">Ville: ${it.ville} • ${it.commune} • ${it.quartier}</div>
+            <p style="font-weight:700;margin-top:6px">${it.prix} FC</p>
+            <p class="small" style="margin-top:8px">${it.description}</p>
+            <p class="small" style="margin-top:8px">Téléphone (masqué): <span class="telMasked">${it.telephone_proprietaire?maskPhone(it.telephone_proprietaire):"non disponible"}</span></p>
+            <div class="row" style="margin-top:10px">
+              <button class="btn revealBtn">Voir le numéro (2500 FC)</button>
+              <button class="btn alt ownerView" style="display:none">Retirer ma maison</button>
+            </div>
+          </div>
+        </div>
+      `;
+      results.appendChild(div);
+
+      // show owner controls if current user is proprietor
+      (async ()=>{
+        try{
+          const u = await account.get();
+          if(u && u.$id === it.proprietaire_id){
+            const btnOwner = div.querySelector('.ownerView'); btnOwner.style.display = 'inline-block';
+            btnOwner.addEventListener('click', async ()=>{
+              if(!confirm("Retirer définitivement cette annonce ?")) return;
+              try{
+                await databases.deleteDocument(DATABASE_ID, COLLECTION_ID, it.$id);
+                alert("Annonce retirée.");
+                loadPublished();
+              }catch(e){ console.error(e); alert("Erreur retrait : "+(e.message||e)); }
+            });
+          }
+        }catch(e){}
+      })();
+
+      // reveal number flow (manual)
+      div.querySelector('.revealBtn').addEventListener('click', ()=>{
+        const ok = confirm(`Pour voir le numéro complet, envoyez ${PRICE_REVEAL} FC au ${PAYMENT_NUMBER}. Quand vous avez payé, cliquez OK.`);
+        if(!ok) return;
+        div.querySelector('.telMasked').textContent = it.telephone_proprietaire || "numéro indisponible";
+        div.querySelector('.revealBtn').style.display = 'none';
+      });
+    });
+  }catch(err){ console.error(err); alert("Erreur lecture annonces : " + (err.message||err)); }
+}
+
+/* ==============
+   ADMIN
+   ============== */
+async function loadPending(){
+  try{
+    const list = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [ Appwrite.Query.equal("statut_maison","en_attente") ]);
+    const pending = list.documents || [];
+    const el = $('adminPending'); el.innerHTML = "";
+    if(pending.length===0){ el.innerHTML = "<p class='small'>Aucune annonce en attente.</p>"; return; }
+    pending.forEach(doc=>{
+      const card = document.createElement('div'); card.className="card";
+      const img = doc.imageId ? `${APPWRITE_ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${doc.imageId}/view?project=${APPWRITE_PROJECT}` : "";
+      card.innerHTML = `
+        <div class="grid">
+          <div>${img?`<img class="property-img" src="${img}">`:"<div style='height:120px;background:rgba(255,255,255,0.02);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)'>Aucune image</div>"}</div>
+          <div>
+            <h3>${doc.titre}</h3>
+            <div class="meta">${doc.ville} • ${doc.commune} • ${doc.quartier}</div>
+            <p style="font-weight:700">Prix: ${doc.prix} FC</p>
+            <p class="small" style="margin-top:6px">${doc.description}</p>
+            <p class="small" style="margin-top:8px">Tel: ${doc.telephone_proprietaire||"non fourni"}</p>
+            <div style="margin-top:8px" class="row">
+              <button class="btn confirmBtn">Confirmer publication</button>
+              <button class="btn alt removeBtn">Retirer</button>
+            </div>
+          </div>
+        </div>
+      `;
+      el.appendChild(card);
+
+      card.querySelector('.confirmBtn').addEventListener('click', async ()=>{
+        if(!confirm("Confirmer la publication ?")) return;
+        try{
+          await databases.updateDocument(DATABASE_ID, COLLECTION_ID, doc.$id, { statut_maison: "publiee", paiement_confirme: true });
+          alert("Annonce publiée.");
+          loadPending();
+        }catch(e){ console.error(e); alert("Erreur : " + (e.message||e)); }
+      });
+
+      card.querySelector('.removeBtn').addEventListener('click', async ()=>{
+        if(!confirm("Retirer cette annonce définitivement ?")) return;
+        try{
+          await databases.deleteDocument(DATABASE_ID, COLLECTION_ID, doc.$id);
+          alert("Annonce retirée.");
+          loadPending();
+        }catch(e){ console.error(e); alert("Erreur suppression : " + (e.message||e)); }
+      });
+    });
+  }catch(err){ console.error(err); alert("Erreur admin : " + (err.message||err)); }
+}
+
+$('confirmAll').addEventListener('click', async ()=>{
+  if(!confirm("Confirmer toutes les annonces en attente ?")) return;
+  try{
+    const list = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [ Appwrite.Query.equal("statut_maison","en_attente") ]);
+    for(const d of list.documents || []) await databases.updateDocument(DATABASE_ID, COLLECTION_ID, d.$id, { statut_maison: "publiee", paiement_confirme: true });
+    alert("Toutes confirmées.");
+    loadPending();
+  }catch(e){ console.error(e); alert("Erreur confirmAll: "+(e.message||e)); }
+});
+$('refreshAdmin').addEventListener('click', loadPending);
+
+/* ==============
+   START: session check
+   ============== */
+(async function(){
+  try{
+    const user = await account.get();
+    if(user) onUserLogged(user);
+  }catch(e){
+    // pas de session -> montre auth
+  }
+})();
+</script>
 </body>
 </html>
